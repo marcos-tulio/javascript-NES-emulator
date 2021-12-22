@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>NES Emulator</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
+
+    <!-- 6502 -->
+    <script src='javascript-6502-emulator/js/helper.js'></script>
+    
+    <script src='javascript-6502-emulator/js/cpu/address.js'></script>
+    <script src='javascript-6502-emulator/js/cpu/instruction.js'></script>
+    <script src='javascript-6502-emulator/js/cpu/opcode.js'></script>
+    <script src='javascript-6502-emulator/js/cpu/cpu.js'></script>
+
+    <script src='javascript-6502-emulator/js/bus.js'></script>
+    
+    <!-- NES -->
+    <script src='nes/cpu.js'></script> 
+    <script src='nes/bus.js'></script> 
+    <script src='nes/ppu.js'></script> 
+    <script src='nes/emulator.js'></script> 
+    
+    <script src='nes/mapper.js'></script> 
+    <script src='nes/cartridge.js'></script> 
+    
+    
+</head>
+
+<body>
+    <div class="form">
+        <label for="rom">ROM:</label>
+        <input id="rom" type="file" onchange="loadRom(this.files[0])"/>
+    </div>
+
+    <script>
+        async function loadRom(file){
+            const array_buffer = await (new Response(file)).arrayBuffer()
+            source = new Uint8Array(array_buffer)
+
+            cart = new NesCartridge(source)
+        }
+    </script>
+
+</body>
+
+</html>
