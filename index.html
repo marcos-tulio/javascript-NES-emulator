@@ -26,24 +26,106 @@
     <script src='nes/mapper.js'></script> 
     <script src='nes/cartridge.js'></script> 
     
-    
+    <style>
+        body{    
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: monospace;
+        }
+
+        .header{
+            margin: auto;
+            text-align: center;
+        }
+
+        .container{
+            display: flex;
+            margin: auto;
+        }
+
+        .col{ 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        canvas, .buttons{
+            border:1px solid #000000;
+            margin: .1rem;
+
+        }
+
+        canvas{
+            display: block;
+        }
+
+        .buttons{
+            display: flex;
+            flex-direction: column;
+            width: 205px; 
+            height: 90px;
+        }
+
+        button, label{
+            margin: 0 .2rem;
+        }
+
+        .form{
+            display: flex;
+            flex-direction: row;
+            margin: auto;
+        }
+
+        .form input{ width: 100%;}
+
+        input#interval{ width: 50px;}
+
+        input#rom{ color: transparent;}
+
+    </style>
 </head>
 
 <body>
-    <div class="form">
-        <label for="rom">ROM:</label>
-        <input id="rom" type="file" onchange="loadRom(this.files[0])"/>
-    </div>
+    <div class="container">
+        <div class="col">
+            <canvas id="screen" width="470" height="665"></canvas>
+        </div>
 
+        <div class="col">
+            <div><canvas id="cpu" width="205" height="135"></canvas></div>
+            <div><canvas id="debugger" width="205" height="430"></canvas></div>
+            
+            <div class="buttons">
+                <div class="form">
+                    <label for="rom">ROM:</label>
+                    <input id="rom" type="file" onchange="loadRom(this.files[0])"/>
+                </div>
+
+                <div class="form">
+                    <label for="interval">Up.Time(ms):</label>
+                    <input id="interval" type="number" value="100"/>
+                    <button onclick="runAuto(this)">Run</button>
+                </div>
+
+                <div class="form">
+                    <button onclick="runManual()">Manual Step</button>
+                    <button onclick="reset()">Reset</button>
+                </div>                
+            </div>
+        </div>      
+    </div>
+    
     <script>
+        
         async function loadRom(file){
             const array_buffer = await (new Response(file)).arrayBuffer()
             source = new Uint8Array(array_buffer)
 
             cart = new NesCartridge(source)
         }
-    </script>
 
+    </script>
 </body>
 
 </html>
