@@ -7,24 +7,24 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
 
-    <!-- 6502 -->
-    <script src='javascript-6502-emulator/js/helper.js'></script>
-    
+    <!-- 6502 scripts -->
+    <script src='javascript-6502-emulator/js/helper.js'></script>    
     <script src='javascript-6502-emulator/js/cpu/address.js'></script>
     <script src='javascript-6502-emulator/js/cpu/instruction.js'></script>
     <script src='javascript-6502-emulator/js/cpu/opcode.js'></script>
     <script src='javascript-6502-emulator/js/cpu/cpu.js'></script>
+    <script src='javascript-6502-emulator/js/bus.js'></script>    
+    <script src='javascript-6502-emulator/js/screen.js'></script>    
+    <script src='javascript-6502-emulator/js/emulator.js'></script>
 
-    <script src='javascript-6502-emulator/js/bus.js'></script>
-    
-    <!-- NES -->
+    <!-- NES scripts -->
     <script src='nes/cpu.js'></script> 
     <script src='nes/bus.js'></script> 
-    <script src='nes/ppu.js'></script> 
-    <script src='nes/emulator.js'></script> 
-    
+    <script src='nes/ppu.js'></script>
     <script src='nes/mapper.js'></script> 
+    <script src='nes/mapper_000.js'></script> 
     <script src='nes/cartridge.js'></script> 
+    <script src='nes/emulator.js'></script> 
     
     <style>
         body{    
@@ -99,31 +99,38 @@
             <div class="buttons">
                 <div class="form">
                     <label for="rom">ROM:</label>
-                    <input id="rom" type="file" onchange="loadRom(this.files[0])"/>
+                    <input id="rom" type="file" onchange="nes.loadRom(this.files[0])"/>
                 </div>
 
                 <div class="form">
                     <label for="interval">Up.Time(ms):</label>
                     <input id="interval" type="number" value="100"/>
-                    <button onclick="runAuto(this)">Run</button>
+                    <button onclick="nes.runAuto(this)">Run</button>
                 </div>
 
                 <div class="form">
-                    <button onclick="runManual()">Manual Step</button>
-                    <button onclick="reset()">Reset</button>
+                    <button onclick="nes.runManual()">Manual Step</button>
+                    <button onclick="nes.init()">Reset</button>
                 </div>                
             </div>
         </div>      
     </div>
     
-    <script>
-        
-        async function loadRom(file){
-            const array_buffer = await (new Response(file)).arrayBuffer()
-            source = new Uint8Array(array_buffer)
+    <script>        
+        // Enable all logs
+        show_log_all = true
 
-            cart = new NesCartridge(source)
+        // Create a Emulator instance
+        const nes = new NesEmulator()
+
+        // Override refresh handle
+        nes.screen.refresh = function(){
+            this.updateCpu()
+            this.updateDisassemble(21)
         }
+
+        // Init Emulator
+        //nes.init()
 
     </script>
 </body>
