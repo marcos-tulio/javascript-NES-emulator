@@ -9,7 +9,6 @@ class NesBus extends Bus{
         super(cpu, 2048)
 
         this.ppu = ppu
-
         this.system_clock_counter = 0
     }
 
@@ -62,7 +61,15 @@ class NesBus extends Bus{
         printLog("NES_BUS as reseted!")
 
         this.cpu.reset()
+        this.system_clock_counter = 0
     }
 
-    clock(){}
+    clock(){
+        this.ppu.clock()
+
+        if (this.system_clock_counter % 3 === 0)
+            this.cpu.clock()
+        
+        this.system_clock_counter++
+    }
 }

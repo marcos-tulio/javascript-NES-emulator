@@ -1,6 +1,8 @@
 //-------------------------------------------------------------
 //                          Emulator
 //-------------------------------------------------------------
+// This class extends Emulator class from 6502 Emulator by Marcos Santos
+//-------------------------------------------------------------
 class NesEmulator extends Emulator{
 
     onCreate(){
@@ -8,7 +10,7 @@ class NesEmulator extends Emulator{
         this.cpu = new NesCpu()
         this.ppu = new NesPpu(this.cpu)
         this.bus = new NesBus(this.cpu, this.ppu)
-        this.screen = new Screen(this.cpu)
+        this.screen = new NesScreen(this.cpu, this.ppu)
 
         //this.bus.setCartridge()
 
@@ -42,5 +44,18 @@ class NesEmulator extends Emulator{
         // reset
         this.cpu.reset()
         this.screen.init()
+    }
+
+    // Override
+    runManual(){
+        do this.bus.clock()
+        while (!this.ppu.frame_complete)
+        
+        do this.bus.clock()
+        while (!this.cpu.complete())
+
+        this.screen.refresh()
+
+        this.ppu.frame_complete = false
     }
 }

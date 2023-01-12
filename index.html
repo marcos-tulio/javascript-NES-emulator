@@ -24,7 +24,9 @@
     <script src='nes/mapper.js'></script> 
     <script src='nes/mapper_000.js'></script> 
     <script src='nes/cartridge.js'></script> 
-    <script src='nes/emulator.js'></script> 
+    <script src='nes/graphics.js'></script>
+    <script src='nes/screen.js'></script>
+    <script src='nes/emulator.js'></script>
     
     <style>
         body{    
@@ -89,7 +91,7 @@
 <body>
     <div class="container">
         <div class="col">
-            <canvas id="screen" width="470" height="665"></canvas>
+            <canvas id="scene" width="470" height="665"></canvas>
         </div>
 
         <div class="col">
@@ -118,15 +120,19 @@
     
     <script>        
         // Enable all logs
-        show_log_all = true
+        show_log_all = false
+        show_log_instruction = false
 
         // Create a Emulator instance
         const nes = new NesEmulator()
+
+        // nes.screen.setSceneCanvas("scene")
 
         // Override refresh handle
         nes.screen.refresh = function(){
             this.updateCpu()
             this.updateDisassemble(21)
+            this.updateScene()
         }
 
         // Init Emulator
