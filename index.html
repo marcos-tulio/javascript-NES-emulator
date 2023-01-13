@@ -52,7 +52,12 @@
             flex-direction: column;
         }
 
-        canvas, .buttons{
+        .row{ 
+            display: flex; 
+            flex-direction: row;
+        }
+
+        canvas, .buttons, .pal_selector{
             border:1px solid #000000;
             margin: .1rem;
 
@@ -62,11 +67,11 @@
             display: block;
         }
 
-        .buttons{
+        .buttons, .pal_selector{
             display: flex;
             flex-direction: column;
-            width: 205px; 
-            height: 90px;
+            gap: .5rem;
+            padding: .5rem;
         }
 
         button, label{
@@ -91,14 +96,30 @@
 <body>
     <div class="container">
         <div class="col">
-            <canvas id="scene" width="470" height="665"></canvas>
+            <div><canvas id="scene"   width="470" height="440"></canvas></div>
+            <div class="row">
+                <canvas id="palette_one" width="233" height="220"></canvas>
+                <canvas id="palette_two" width="232" height="220"></canvas>
+            </div>
+            <div class="pal_selector">
+                <div class="form">
+                    <button onclick="nes.screen.prevPalette('palette_value')">Prev Palette</button>
+
+                    <div class="row">
+                        <label for="palette_value">Palette:</label>
+                        <input id="palette_value" type="number" disabled value="0"/>
+                    </div> 
+
+                    <button onclick="nes.screen.nextPalette('palette_value')">Next Palette</button>
+                </div>                
+            </div>
         </div>
 
         <div class="col">
             <div><canvas id="cpu" width="205" height="135"></canvas></div>
             <div><canvas id="debugger" width="205" height="430"></canvas></div>
             
-            <div class="buttons">
+            <div class="buttons" style="width: 189px; height: 115px;">
                 <div class="form">
                     <label for="rom">ROM:</label>
                     <input id="rom" type="file" onchange="nes.loadRom(this.files[0])"/>
@@ -113,7 +134,7 @@
                 <div class="form">
                     <button onclick="nes.runManual()">Manual Step</button>
                     <button onclick="nes.init()">Reset</button>
-                </div>                
+                </div>              
             </div>
         </div>      
     </div>
@@ -133,6 +154,7 @@
             this.updateCpu()
             this.updateDisassemble(21)
             this.updateScene()
+            this.updatePalettes()
         }
 
         // Init Emulator

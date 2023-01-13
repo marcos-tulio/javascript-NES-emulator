@@ -108,10 +108,23 @@ class NesPpu{
     write(addr, data){
         addr &= 0x3FFF
 
-        if (this.cart.ppuWrite(addr, data) != undefined){
-            // do nothing
-        }
+        if (this.cart.ppuWrite(addr, data) !== undefined){}
 
+        else if (addr >= 0x0000 && addr <= 0x1FFF)
+            this.tbl_pattern[(addr & 0x1000) >> 12][addr & 0x0FFF] = data
+
+        else if (addr >= 0x2000 && addr <= 0x3EFF){} 
+
+        else if (addr >= 0x3F00 && addr <= 0x3FFF){
+            addr &= 0x001F
+
+            if (addr === 0x0010) addr = 0x0000
+            if (addr === 0x0014) addr = 0x0004
+            if (addr === 0x0018) addr = 0x0008
+            if (addr === 0x001C) addr = 0x000C
+
+            this.tbl_palette[addr] = data
+        }
     }
 
     read(addr, isReadOnly = false){
@@ -120,8 +133,23 @@ class NesPpu{
 
         let cart_read = this.cart.ppuRead(addr)
 
-        if (cart_read != undefined){
-            data = cart_read
+        if (cart_read !== undefined)
+            data = forceUInt8(cart_read)
+        
+        else if (addr >= 0x0000 && addr <= 0x1FFF)
+            data = this.tbl_pattern[(addr & 0x1000) >> 12][addr & 0x0FFF]
+
+        else if (addr >= 0x2000 && addr <= 0x3EFF){} 
+
+        else if (addr >= 0x3F00 && addr <= 0x3FFF){
+            addr &= 0x001F
+
+            if (addr === 0x0010) addr = 0x0000
+            if (addr === 0x0014) addr = 0x0004
+            if (addr === 0x0018) addr = 0x0008
+            if (addr === 0x001C) addr = 0x000C
+
+            data = this.tbl_palette[addr]
         }
 
         printLog("NES_PPU read 0x" + toHex(data) + " at address 0x" + toHex(addr) )
@@ -153,4 +181,40 @@ class NesPpu{
         }
     }
 
+    getPatternTable(i, palette){
+        for (let nTileY = 0; nTileY < 16; nTileY++) {
+            for (let nTileX = 0; nTileX < 16; nTileX++) {
+
+                let nOffset = forceUInt16(nTileY * 256 + nTileX * 16)
+
+                for (let row = 0; row < 8; row++) {
+                    let tile_lsb = forceUInt8(this.read(i * 0x1000 + nOffset + row + 0x0000))
+                    let tile_msb = forceUInt8(this.read(i * 0x1000 + nOffset + row + 0x0008))
+
+                    for (let col = 0; col < 8; col++) {
+                        let pixel = forceUInt8((tile_lsb & 0x01) + (tile_msb & 0x01))
+
+                        tile_lsb >>= 1
+                        tile_msb >>= 1
+
+                        this.spr_pattern_tbl[i].setPixel(
+                            nTileX * 8 + (7 - col),
+                            nTileY * 8 + row,
+                            this.getColourFromPaletteRam(palette, pixel)
+                        )
+                    }
+                }
+            }
+        }
+        
+
+        return this.spr_pattern_tbl[i]
+    }
+
+    getColourFromPaletteRam(palette, pixel){
+
+        let value = forceUInt8(this.read(0x3F00 + (palette << 2) + pixel))
+
+        return this.pal_screen[value & 0x3F]
+    }
 }
